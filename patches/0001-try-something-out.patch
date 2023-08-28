@@ -1,0 +1,76 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: guihkx <626206+guihkx@users.noreply.github.com>
+Date: Wed, 30 Aug 2023 03:03:34 -0300
+Subject: try something out
+
+---
+ src/dbmanager.cpp  |  3 ++-
+ src/mainwindow.cpp | 29 ++++++++++++++---------------
+ 2 files changed, 16 insertions(+), 16 deletions(-)
+
+diff --git a/src/dbmanager.cpp b/src/dbmanager.cpp
+index 6b7d9f4..fcac053 100644
+--- a/src/dbmanager.cpp
++++ b/src/dbmanager.cpp
+@@ -1743,6 +1743,7 @@ void DBManager::onCreateUpdateRequestedNoteContent(const NodeData &note)
+  */
+ void DBManager::onImportNotesRequested(const QString &fileName)
+ {
++    qDebug() << __FUNCTION__ << __LINE__ << "Opening database file:" << fileName;
+     QFile file(fileName);
+     if (!file.open(QIODevice::ReadOnly)) {
+         qDebug() << __FUNCTION__ << __LINE__ << "fail to open file";
+@@ -1755,7 +1756,7 @@ void DBManager::onImportNotesRequested(const QString &fileName)
+         auto outside_db = QSqlDatabase::addDatabase("QSQLITE", OUTSIDE_DATABASE_NAME);
+         outside_db.setDatabaseName(fileName);
+         if (!outside_db.open()) {
+-            qDebug() << __FUNCTION__ << "Error: connection with database fail";
++            qDebug() << __FUNCTION__ << "Error: connection with database fail:" << outside_db.lastError();
+             return;
+         } else {
+             qDebug() << __FUNCTION__ << "Database: connection ok";
+diff --git a/src/mainwindow.cpp b/src/mainwindow.cpp
+index 49b18b6..bff8d1e 100644
+--- a/src/mainwindow.cpp
++++ b/src/mainwindow.cpp
+@@ -2513,23 +2513,22 @@ void MainWindow::executeImport(const bool replace)
+                                                     tr("Notes Backup File (*.nbk)"));
+     if (fileName.isEmpty()) {
+         return;
++    }
++    qDebug() << "got file:" << fileName << "from file picker";
++    QFileInfo file(fileName);
++    if (!file.isReadable()) {
++        QMessageBox::information(this, tr("Unable to open file"), tr("File is not readable"));
++        return;
++    }
++    QString absolutePath = file.canonicalFilePath();
++    qDebug() << "absolute path:" << absolutePath;
++    setButtonsAndFieldsEnabled(false);
++    if (replace) {
++        emit requestRestoreNotes(absolutePath);
+     } else {
+-        QFile file(fileName);
+-        if (!file.open(QIODevice::ReadOnly)) {
+-            QMessageBox::information(this, tr("Unable to open file"), file.errorString());
+-            return;
+-        }
+-        file.close();
+-
+-        setButtonsAndFieldsEnabled(false);
+-        if (replace) {
+-            emit requestRestoreNotes(fileName);
+-        } else {
+-            emit requestImportNotes(fileName);
+-        }
+-        setButtonsAndFieldsEnabled(true);
+-        //        emit requestNotesList(SpecialNodeID::RootFolder, true);
++        emit requestImportNotes(absolutePath);
+     }
++    setButtonsAndFieldsEnabled(true);
+ }
+ 
+ /*!
+-- 
+2.42.0
+
