@@ -26,3 +26,6 @@ modules:
         x-checker-data:
           type: git
           tag-pattern: ^v([\d.]+)$
+      # https://github.com/nuttyartist/notes/commit/d7d781ee1dd9fd8670ae7f4ea5fc798bcb0acb2a
+      - type: patch
+        path: patches/0001-Fix-730-by-adding-this-to-createWindowContainer-calls.patch

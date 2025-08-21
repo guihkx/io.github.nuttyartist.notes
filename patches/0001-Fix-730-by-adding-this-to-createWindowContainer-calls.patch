@@ -1,0 +1,31 @@
+From d7d781ee1dd9fd8670ae7f4ea5fc798bcb0acb2a Mon Sep 17 00:00:00 2001
+From: zjeffer <4633209+zjeffer@users.noreply.github.com>
+Date: Sun, 2 Feb 2025 10:44:55 +0100
+Subject: [PATCH] Fix #730 by adding 'this' to createWindowContainer calls
+
+---
+ src/mainwindow.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/mainwindow.cpp b/src/mainwindow.cpp
+index 96d383e8..d0a7e9a4 100644
+--- a/src/mainwindow.cpp
++++ b/src/mainwindow.cpp
+@@ -1047,7 +1047,7 @@ void MainWindow::setupEditorSettings()
+     m_editorSettingsQuickView.setResizeMode(QQuickView::SizeViewToRootObject);
+     m_editorSettingsQuickView.setFlags(Qt::FramelessWindowHint);
+     m_editorSettingsQuickView.setColor(Qt::transparent);
+-    m_editorSettingsWidget = QWidget::createWindowContainer(&m_editorSettingsQuickView, nullptr);
++    m_editorSettingsWidget = QWidget::createWindowContainer(&m_editorSettingsQuickView, this);
+ #if defined(Q_OS_MACOS)
+ #  if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+     m_editorSettingsWidget->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint
+@@ -1291,7 +1291,7 @@ void MainWindow::setupKanbanView()
+     m_kanbanQuickView.rootContext()->setContextProperty("mainWindow", this);
+     m_kanbanQuickView.setSource(source);
+     m_kanbanQuickView.setResizeMode(QQuickView::SizeRootObjectToView);
+-    m_kanbanWidget = QWidget::createWindowContainer(&m_kanbanQuickView);
++    m_kanbanWidget = QWidget::createWindowContainer(&m_kanbanQuickView, this);
+     m_kanbanWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+     m_kanbanWidget->hide();
+     ui->verticalLayout_textEdit->insertWidget(ui->verticalLayout_textEdit->indexOf(m_textEdit),
